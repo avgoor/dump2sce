@@ -19,12 +19,14 @@ func main() {
 	defer pprof.StopCPUProfile()
 	x, _ := http.Get("https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv")
 	outs := bufio.NewScanner(x.Body) //scanner returns lines one by one
+	cons := bufio.NewWriter(os.Stdout)
 	for outs.Scan() {
 		// short strings contain no data, so omit them
 		if val := strings.Split(outs.Text(), ";"); len(val) > 2 {
-			//fmt.Printf(">>%q<<\n", val[2])
+			fmt.Fprintln(cons, val[2])
 		} else {
 			fmt.Printf("short: %q\n", val)
 		}
 	}
+	cons.Flush()
 }
