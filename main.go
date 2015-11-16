@@ -10,16 +10,20 @@ import (
 )
 
 func url2sce(url string) string {
+	if url[5:] == "https" {
+		return ""
+	}
 	return ""
 }
 
 func main() {
 	fileprof, _ := os.Create("./profile_go")
+	fileout, _ := os.Create("./urls")
 	pprof.StartCPUProfile(fileprof)
 	defer pprof.StopCPUProfile()
 	x, _ := http.Get("https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv")
 	outs := bufio.NewScanner(x.Body) //scanner returns lines one by one
-	cons := bufio.NewWriter(os.Stdout)
+	cons := bufio.NewWriter(fileout)//buffered output fast as hell
 	for outs.Scan() {
 		// short strings contain no data, so omit them
 		if val := strings.Split(outs.Text(), ";"); len(val) > 2 {
@@ -29,4 +33,5 @@ func main() {
 		}
 	}
 	cons.Flush()
+	fileout.Close()
 }
