@@ -27,7 +27,8 @@ func main() {
 	for outs.Scan() {
 		// short strings contain no data, so omit them
 		if val := strings.Split(outs.Text(), ";"); len(val) > 2 {
-			fmt.Fprintln(cons, val[2])
+//			fmt.Fprintln(cons, val[2])
+			fileout.Write([]byte (val[2] + "\n"))
 		} else {
 			fmt.Printf("short: %q\n", val)
 		}
