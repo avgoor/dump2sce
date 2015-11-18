@@ -7,6 +7,7 @@ import (
 	"runtime/pprof"
 	"strings"
 	"os"
+	"time"
 )
 
 func url2sce(url string) string {
@@ -21,18 +22,22 @@ func main() {
 	fileout, _ := os.Create("./urls")
 	pprof.StartCPUProfile(fileprof)
 	defer pprof.StopCPUProfile()
+	fmt.Printf("Downloading: %s\n", time.Now())
 	x, _ := http.Get("https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv")
+	fmt.Printf("Getted: %s\n", time.Now())
 	outs := bufio.NewScanner(x.Body) //scanner returns lines one by one
 	cons := bufio.NewWriter(fileout)//buffered output fast as hell
+	fmt.Printf("Before scan: %s\n", time.Now())
 	for outs.Scan() {
 		// short strings contain no data, so omit them
 		if val := strings.Split(outs.Text(), ";"); len(val) > 2 {
-//			fmt.Fprintln(cons, val[2])
-			fileout.Write([]byte (val[2] + "\n"))
+			cons.Write([]byte (val[2]+"\n"))
+			//fileout.Write([]byte (val[2] + "\n"))
 		} else {
 			fmt.Printf("short: %q\n", val)
 		}
 	}
 	cons.Flush()
 	fileout.Close()
+	fmt.Printf("After scan: %s\n", time.Now())
 }
