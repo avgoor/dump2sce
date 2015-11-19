@@ -31,8 +31,7 @@ func main() {
 	for outs.Scan() {
 		// short strings contain no data, so omit them
 		if val := strings.Split(outs.Text(), ";"); len(val) > 2 {
-			cons.Write([]byte (val[2]+"\n"))
-			//fileout.Write([]byte (val[2] + "\n"))
+			cons.WriteString(strings.Join(val, "!") + "\n")
 		} else {
 			fmt.Printf("short: %q\n", val)
 		}
