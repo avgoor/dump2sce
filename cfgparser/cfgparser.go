@@ -8,12 +8,13 @@ import (
 
 type CFG struct {
 	ZapretFileURL string
-	FTPURL string
-	FlavorID int
+	FTPURL        string
+	FlavorID      int
 }
+
 //parses json-file referenced by path into CFG
 
-func GetCFG (path string) (CFG, error) {
+func GetCFG(path string) (CFG, error) {
 	cfgfile, err := os.Open(path)
 	if err != nil {
 		return CFG{}, err
@@ -30,5 +31,5 @@ func GetCFG (path string) (CFG, error) {
 
 func (c *CFG) String() string {
 	return "[URL: " + c.ZapretFileURL + " ; FTP: " +
-			c.FTPURL + " ; FlavorID: " + strconv.Itoa(c.FlavorID) + "]"
+		c.FTPURL + " ; FlavorID: " + strconv.Itoa(c.FlavorID) + "]"
 }
