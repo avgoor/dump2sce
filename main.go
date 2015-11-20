@@ -8,6 +8,8 @@ import (
 	"strings"
 	"os"
 	"time"
+
+	"./cfgparser"
 )
 
 func url2sce(url string) string {
@@ -18,12 +20,20 @@ func url2sce(url string) string {
 }
 
 func main() {
+	filename := "./config.json"
+	Config, err := cfgparser.GetCFG(filename)
+	if err != nil {
+		fmt.Println("Cannot read config from:", filename)
+		os.Exit(1)
+	}
+
+	fmt.Println(Config.String())
 	fileprof, _ := os.Create("./profile_go")
 	fileout, _ := os.Create("./urls")
 	pprof.StartCPUProfile(fileprof)
 	defer pprof.StopCPUProfile()
 	fmt.Printf("Downloading: %s\n", time.Now())
-	x, _ := http.Get("https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv")
+	x, _ := http.Get(Config.ZapretFileURL)
 	fmt.Printf("Getted: %s\n", time.Now())
 	outs := bufio.NewScanner(x.Body) //scanner returns lines one by one
 	cons := bufio.NewWriter(fileout)//buffered output fast as hell
