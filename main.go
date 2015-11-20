@@ -1,12 +1,13 @@
 package main
+
 //sce-url-database import cleartext-file ftp://ftp:ftp@46.148.208.22/pub/zi.list flavor-id 300
 import (
-	"net/http"
-	"fmt"
 	"bufio"
+	"fmt"
+	"net/http"
+	"os"
 	"runtime/pprof"
 	"strings"
-	"os"
 	"time"
 
 	"./cfgparser"
@@ -36,7 +37,7 @@ func main() {
 	x, _ := http.Get(Config.ZapretFileURL)
 	fmt.Printf("Getted: %s\n", time.Now())
 	outs := bufio.NewScanner(x.Body) //scanner returns lines one by one
-	cons := bufio.NewWriter(fileout)//buffered output fast as hell
+	cons := bufio.NewWriter(fileout) //buffered output fast as hell
 	fmt.Printf("Before scan: %s\n", time.Now())
 	for outs.Scan() {
 		// short strings contain no data, so omit them
