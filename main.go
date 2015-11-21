@@ -4,12 +4,12 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"runtime/pprof"
 	"strings"
 	"time"
-	"log"
 
 	"./cfgparser"
 )
@@ -22,14 +22,18 @@ func url2sce(url string) string {
 }
 
 func main() {
+	os.Exit(RealMain())
+}
+
+func RealMain() int {
 	filename := cfgparser.GetFilename()
 	Config, err := cfgparser.GetCFG(filename)
 	if err != nil {
 		fmt.Println("Cannot read config from:", filename)
-		os.Exit(1)
+		return 1
 	}
 
-	LOG := log.New(os.Stdout,"DUMPER:", log.Lshortfile | log.Ltime)
+	LOG := log.New(os.Stdout, "DUMPER:", log.Lshortfile|log.Ltime)
 	LOG.Print(Config.String())
 	fileprof, _ := os.Create("./profile_go")
 	fileout, _ := os.Create("./urls")
@@ -52,4 +56,5 @@ func main() {
 	cons.Flush()
 	fileout.Close()
 	LOG.Printf("After scan: %s\n", time.Now())
+	return 0
 }
