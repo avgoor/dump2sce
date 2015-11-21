@@ -2,9 +2,12 @@ package cfgparser
 
 import (
 	"encoding/json"
+	"flag"
 	"os"
 	"strconv"
 )
+
+var filename = flag.String("file", "./config.json", "Filename and fullpath to the config file")
 
 type CFG struct {
 	ZapretFileURL string
@@ -32,4 +35,9 @@ func GetCFG(path string) (CFG, error) {
 func (c *CFG) String() string {
 	return "[URL: " + c.ZapretFileURL + " ; FTP: " +
 		c.FTPURL + " ; FlavorID: " + strconv.Itoa(c.FlavorID) + "]"
+}
+
+func GetFilename() string {
+	flag.Parse()
+	return *filename
 }

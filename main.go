@@ -21,7 +21,7 @@ func url2sce(url string) string {
 }
 
 func main() {
-	filename := "./config.json"
+	filename := cfgparser.GetFilename()
 	Config, err := cfgparser.GetCFG(filename)
 	if err != nil {
 		fmt.Println("Cannot read config from:", filename)
