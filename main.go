@@ -26,19 +26,25 @@ func main() {
 }
 
 func RealMain() int {
+	LOG := log.New(os.Stdout, "DUMPER:", log.Lshortfile|log.Ltime)
 	filename := cfgparser.GetFilename()
 	Config, err := cfgparser.GetCFG(filename)
 	if err != nil {
 		fmt.Println("Cannot read config from:", filename)
 		return 1
 	}
-
-	LOG := log.New(os.Stdout, "DUMPER:", log.Lshortfile|log.Ltime)
 	LOG.Print(Config.String())
-	fileprof, _ := os.Create("./profile_go")
+	if *cfgparser.IsProfiling { //flag returns pointers
+		fileprof, err := os.Create("./profile_go")
+		if err != nil {
+			LOG.Println("Cannot create ./profile_go!")
+			return 2
+		}
+		pprof.StartCPUProfile(fileprof)
+		defer fileprof.Close()
+		defer pprof.StopCPUProfile()
+	}
 	fileout, _ := os.Create("./urls")
-	pprof.StartCPUProfile(fileprof)
-	defer pprof.StopCPUProfile()
 	LOG.Printf("Downloading: %s\n", time.Now())
 	x, _ := http.Get(Config.ZapretFileURL)
 	LOG.Printf("Getted: %s\n", time.Now())
