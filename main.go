@@ -9,6 +9,7 @@ import (
 	"runtime/pprof"
 	"strings"
 	"time"
+	"log"
 
 	"./cfgparser"
 )
@@ -28,26 +29,27 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Println(Config.String())
+	LOG := log.New(os.Stdout,"DUMPER:", log.Lshortfile | log.Ltime)
+	LOG.Print(Config.String())
 	fileprof, _ := os.Create("./profile_go")
 	fileout, _ := os.Create("./urls")
 	pprof.StartCPUProfile(fileprof)
 	defer pprof.StopCPUProfile()
-	fmt.Printf("Downloading: %s\n", time.Now())
+	LOG.Printf("Downloading: %s\n", time.Now())
 	x, _ := http.Get(Config.ZapretFileURL)
-	fmt.Printf("Getted: %s\n", time.Now())
+	LOG.Printf("Getted: %s\n", time.Now())
 	outs := bufio.NewScanner(x.Body) //scanner returns lines one by one
 	cons := bufio.NewWriter(fileout) //buffered output fast as hell
-	fmt.Printf("Before scan: %s\n", time.Now())
+	LOG.Printf("Before scan: %s\n", time.Now())
 	for outs.Scan() {
 		// short strings contain no data, so omit them
 		if val := strings.Split(outs.Text(), ";"); len(val) > 2 {
 			cons.WriteString(strings.Join(val, "!") + "\n")
 		} else {
-			fmt.Printf("short: %q\n", val)
+			LOG.Printf("short: %q\n", val)
 		}
 	}
 	cons.Flush()
 	fileout.Close()
-	fmt.Printf("After scan: %s\n", time.Now())
+	LOG.Printf("After scan: %s\n", time.Now())
 }
