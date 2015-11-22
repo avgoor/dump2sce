@@ -22,10 +22,11 @@ func url2sce(url string) string {
 }
 
 func main() {
+	//this will preserve exit code and all the defers same time
 	os.Exit(RealMain())
 }
 
-var LOG = log.New(os.Stdout, "DUMPER:", log.Lshortfile|log.Ltime|log.Lmicroseconds)
+var LOG = log.New(os.Stdout, "DUMPER:", log.Lshortfile|log.Ltime|log.Lmicroseconds|log.Ldate)
 
 func defCloser(x io.Closer) {
 	LOG.Println("About to close:", x)
@@ -72,7 +73,8 @@ func RealMain() int {
 	LOG.Println("Starting scan")
 	for outs.Scan() {
 		// short strings contain no data, so omit them
-		if val := strings.Split(outs.Text(), ";"); len(val) > 2 {
+		val := strings.Split(outs.Text(), ";")
+		if len(val) > 2 {
 			cons.WriteString(strings.Join(val, "!") + "\n")
 		} else {
 			LOG.Printf("Invalid string. Too short: %q\n", val)
