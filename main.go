@@ -9,7 +9,6 @@ import (
 	"os"
 	"runtime/pprof"
 	"strings"
-	"time"
 
 	"./cfgparser"
 )
@@ -26,7 +25,7 @@ func main() {
 }
 
 func RealMain() int {
-	LOG := log.New(os.Stdout, "DUMPER:", log.Lshortfile|log.Ltime)
+	LOG := log.New(os.Stdout, "DUMPER:", log.Lshortfile|log.Ltime|log.Lmicroseconds)
 	filename := cfgparser.GetFilename()
 	Config, err := cfgparser.GetCFG(filename)
 	if err != nil {
@@ -45,22 +44,22 @@ func RealMain() int {
 		defer pprof.StopCPUProfile()
 	}
 	fileout, _ := os.Create("./urls")
-	LOG.Printf("Downloading: %s\n", time.Now())
+	LOG.Println("Downloading...")
 	x, _ := http.Get(Config.ZapretFileURL)
-	LOG.Printf("Getted: %s\n", time.Now())
+	LOG.Println("Got file")
 	outs := bufio.NewScanner(x.Body) //scanner returns lines one by one
 	cons := bufio.NewWriter(fileout) //buffered output fast as hell
-	LOG.Printf("Before scan: %s\n", time.Now())
+	LOG.Println("Starting scan")
 	for outs.Scan() {
 		// short strings contain no data, so omit them
 		if val := strings.Split(outs.Text(), ";"); len(val) > 2 {
 			cons.WriteString(strings.Join(val, "!") + "\n")
 		} else {
-			LOG.Printf("short: %q\n", val)
+			LOG.Printf("Invalid string. Too short: %q\n", val)
 		}
 	}
 	cons.Flush()
 	fileout.Close()
-	LOG.Printf("After scan: %s\n", time.Now())
+	LOG.Println("Scan finished")
 	return 0
 }
