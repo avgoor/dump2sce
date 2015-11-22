@@ -16,7 +16,7 @@ import (
 
 func url2sce(url string) string {
 	if url[5:] == "https" {
-		return ""
+		return "no way"
 	}
 	return ""
 }
