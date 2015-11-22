@@ -26,14 +26,14 @@ func main() {
 
 func RealMain() int {
 	LOG := log.New(os.Stdout, "DUMPER:", log.Lshortfile|log.Ltime|log.Lmicroseconds)
-	filename := cfgparser.GetFilename()
+	filename := cfgparser.Filename
 	Config, err := cfgparser.GetCFG(filename)
 	if err != nil {
 		fmt.Println("Cannot read config from:", filename)
 		return 1
 	}
 	LOG.Print(Config.String())
-	if *cfgparser.IsProfiling { //flag returns pointers
+	if cfgparser.IsProfiling {
 		fileprof, err := os.Create("./profile_go")
 		if err != nil {
 			LOG.Println("Cannot create ./profile_go!")
