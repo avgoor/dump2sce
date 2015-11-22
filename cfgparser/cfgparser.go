@@ -7,8 +7,8 @@ import (
 	"strconv"
 )
 
-var filename = flag.String("file", "./config.json", "Filename and fullpath to the config file")
-var IsProfiling = flag.Bool("profile", false, "Turns on profiling")
+var Filename string
+var IsProfiling bool
 
 type CFG struct {
 	ZapretFileURL string
@@ -17,6 +17,8 @@ type CFG struct {
 }
 
 func init(){
+	flag.StringVar(&Filename, "file", "./config.json", "Filename and fullpath to the config file")
+	flag.BoolVar(&IsProfiling, "profile", false, "Turns on profiling")
 	flag.Parse()
 }
 
@@ -42,6 +44,3 @@ func (c *CFG) String() string {
 		c.FTPURL + " ; FlavorID: " + strconv.Itoa(c.FlavorID) + "]"
 }
 
-func GetFilename() string {
-	return *filename
-}
