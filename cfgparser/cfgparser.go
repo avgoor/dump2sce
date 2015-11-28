@@ -13,10 +13,12 @@ var IsProfiling bool
 type CFG struct {
 	ZapretFileURL string
 	FTPURL        string
+	URLfile       string
+	IPfile        string
 	FlavorID      int
 }
 
-func init(){
+func init() {
 	flag.StringVar(&Filename, "file", "./config.json", "Filename and fullpath to the config file")
 	flag.BoolVar(&IsProfiling, "profile", false, "Turns on profiling")
 	flag.Parse()
@@ -43,4 +45,3 @@ func (c *CFG) String() string {
 	return "[URL: " + c.ZapretFileURL + " ; FTP: " +
 		c.FTPURL + " ; FlavorID: " + strconv.Itoa(c.FlavorID) + "]"
 }
-

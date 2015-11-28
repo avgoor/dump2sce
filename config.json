@@ -1,5 +1,8 @@
 {
-    "ZapretFileURL": "https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv",
-    "FTPURL": "ftp://ftp:ftp@127.0.0.1/pub/zi.list",
-    "FlavorID": 300
+  "ZapretFileURL": "https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv",
+  "FTPURL": "ftp://ftp:ftp@127.0.0.1/pub/zi.list",
+  "FlavorID": 300,
+  "URLFile": "./zapret.url",
+  "IPFile": "./zapret.ips",
+  "Nonexistent": "parameter"
 }

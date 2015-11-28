@@ -14,11 +14,26 @@ import (
 	"io"
 )
 
-func url2sce(url string) string {
-	if url[5:] == "https" {
-		return "no way"
+//parse an array of string and returns URL
+func url_parse(raw []string, urls map[string]bool, ips map[string]bool) bool {
+	if len(raw) < 3 { //short strings is a problem
+		return false
 	}
-	return ""
+	//raw format [ip | ip2 | ip3][host][url | url2 | url3 (not always exists)]
+	if len(raw[2]) > 5 {
+		if raw[2][:5] != "http:" {
+			for _, v := range strings.Split(raw[0], " | ") {
+				ips[v] = true
+			}
+			return true
+		} else {
+			for _, v := range strings.Split(raw[2], " | ") {
+				urls[v] = true
+			}
+			return true
+		}
+	}
+	return false
 }
 
 func main() {
@@ -35,29 +50,40 @@ func defCloser(x io.Closer) {
 }
 
 func RealMain() int {
+	urls := make(map[string]bool, 15000)
+	ips := make(map[string]bool, 2000)
 	filename := cfgparser.Filename
 	Config, err := cfgparser.GetCFG(filename)
 	if err != nil {
 		fmt.Println("Cannot read config from:", filename)
 		return 1
 	}
-	LOG.Print(Config.String())
+	LOG.Print(Config)
 	if cfgparser.IsProfiling {
 		fileprof, err := os.Create("./profile_go")
 		if err != nil {
 			LOG.Println("Cannot create ./profile_go!")
 			return 2
 		}
-		pprof.StartCPUProfile(fileprof)
+		//		pprof.StartCPUProfile(fileprof)
 		defer defCloser(fileprof)
-		defer pprof.StopCPUProfile()
+		//		defer pprof.StopCPUProfile()
+		defer pprof.WriteHeapProfile(fileprof)
 	}
-	fileout, err := os.Create("./urls")
+
+	URLFile, err := os.Create(Config.URLfile)
 	if err != nil {
 		LOG.Println("Cannot write to urls-file!")
 		return 8
 	}
-	defer defCloser(fileout)
+	defer defCloser(URLFile)
+
+	IPFile, err := os.Create(Config.IPfile)
+	if err != nil {
+		LOG.Println("Cannot write to ips-file!")
+		return 8
+	}
+	defer defCloser(IPFile)
 
 	LOG.Println("Downloading...")
 	x, err := http.Get(Config.ZapretFileURL)
@@ -68,19 +94,24 @@ func RealMain() int {
 		defer defCloser(x.Body)
 	}
 	LOG.Println("Got file")
-	outs := bufio.NewScanner(x.Body) //scanner returns lines one by one
-	cons := bufio.NewWriter(fileout) //buffered output fast as hell
+
+	outs := bufio.NewScanner(x.Body)       //scanner returns lines one by one
+	URLFile_fd := bufio.NewWriter(URLFile) //buffered output fast as hell
+	IPFile_fd := bufio.NewWriter(IPFile)
 	LOG.Println("Starting scan")
 	for outs.Scan() {
 		// short strings contain no data, so omit them
 		val := strings.Split(outs.Text(), ";")
-		if len(val) > 2 {
-			cons.WriteString(strings.Join(val, "!") + "\n")
-		} else {
-			LOG.Printf("Invalid string. Too short: %q\n", val)
-		}
+		_ = url_parse(val, urls, ips)
 	}
-	cons.Flush()
+	for v, _ := range urls {
+		URLFile_fd.WriteString(v + "\n")
+	}
+	for v, _ := range ips {
+		IPFile_fd.WriteString(v + "\n")
+	}
+	URLFile_fd.Flush()
+	IPFile_fd.Flush()
 	LOG.Println("Scan finished")
 	return 0
 }
