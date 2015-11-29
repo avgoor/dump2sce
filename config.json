@@ -4,5 +4,5 @@
   "FlavorID": 300,
   "URLFile": "./zapret.url",
   "IPFile": "./zapret.ips",
-  "Nonexistent": "parameter"
+  "ACLName": "zapret"
 }

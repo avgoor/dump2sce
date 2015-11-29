@@ -1,4 +1,4 @@
-package cfgparser
+package utils
 
 import (
 	"encoding/json"
@@ -15,6 +15,7 @@ type CFG struct {
 	FTPURL        string
 	URLfile       string
 	IPfile        string
+	ACLName       string
 	FlavorID      int
 }
 

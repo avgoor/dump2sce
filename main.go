@@ -10,7 +10,7 @@ import (
 	"runtime/pprof"
 	"strings"
 
-	"./cfgparser"
+	"./utils"
 	"io"
 )
 
@@ -58,14 +58,14 @@ func defCloser(x io.Closer) {
 func RealMain() int {
 	urls := make(map[string]bool, 15000)
 	ips := make(map[string]bool, 2000)
-	filename := cfgparser.Filename
-	Config, err := cfgparser.GetCFG(filename)
+	filename := utils.Filename
+	Config, err := utils.GetCFG(filename)
 	if err != nil {
 		fmt.Println("Cannot read config from:", filename)
 		return 1
 	}
 	LOG.Print(Config)
-	if cfgparser.IsProfiling {
+	if utils.IsProfiling {
 		fileprof, err := os.Create("./profile_go")
 		if err != nil {
 			LOG.Println("Cannot create ./profile_go!")
