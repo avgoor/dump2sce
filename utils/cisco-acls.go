@@ -2,7 +2,7 @@ package utils
 
 import (
 	"fmt"
-	"net"
+	//	"net"
 )
 
 func MakeCiscoACL(ips map[string]bool, aclname string) string {
@@ -17,7 +17,7 @@ func MakeCiscoACL(ips map[string]bool, aclname string) string {
 	return all
 }
 
-func UploadToCisco(ip net.IPAddr, listing string) bool {
+func UploadToCisco(ip string, listing string) bool {
 	// uploads listing to the cisco-like router/switch
 	// using telnet. returns true on success, otherwise false
 

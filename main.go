@@ -15,32 +15,6 @@ import (
 )
 
 //parse an array of string and returns URL
-func url_parse(raw []string, urls map[string]bool, ips map[string]bool) bool {
-	if len(raw) < 3 { //short strings is a problem
-		return false
-	}
-	//raw format [ip | ip2 | ip3][host][url | url2 | url3 (not always exists)]
-	if len(raw[2]) > 5 {
-		if raw[2][:5] != "http:" {
-			for _, v := range strings.Split(raw[0], " | ") {
-				ips[v] = true
-			}
-			return true
-		} else {
-			for _, v := range strings.Split(raw[2], " | ") {
-				v := normalize_url(v)
-				urls[v] = true
-			}
-			return true
-		}
-	}
-	return false
-}
-
-func normalize_url(src string) string {
-	//takes string and escapes ":" in it
-	return src[:5] + strings.Replace(src[5:], ":", "\\:", -1)
-}
 
 func main() {
 	//this will preserve exit code and all the defers same time
@@ -108,7 +82,7 @@ func RealMain() int {
 	for outs.Scan() {
 		// short strings contain no data, so omit them
 		val := strings.Split(outs.Text(), ";")
-		_ = url_parse(val, urls, ips)
+		_ = utils.Url_parse(val, urls, ips)
 	}
 	for v, _ := range urls {
 		URLFile_fd.WriteString(v + "\n")
