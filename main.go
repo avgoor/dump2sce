@@ -2,16 +2,14 @@ package main
 
 //sce-url-database import cleartext-file ftp://ftp:ftp@46.148.208.22/pub/zi.list flavor-id 300
 import (
+	"./utils"
 	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
-	"runtime/pprof"
 	"strings"
-
-	"./utils"
-	"io"
 )
 
 //parse an array of string and returns URL
@@ -48,7 +46,7 @@ func RealMain() int {
 		//		pprof.StartCPUProfile(fileprof)
 		defer defCloser(fileprof)
 		//		defer pprof.StopCPUProfile()
-		defer pprof.WriteHeapProfile(fileprof)
+		//defer pprof.WriteHeapProfile(fileprof)
 	}
 
 	URLFile, err := os.Create(Config.URLfile)
