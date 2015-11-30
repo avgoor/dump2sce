@@ -113,9 +113,9 @@ func RealMain() int {
 	for v, _ := range urls {
 		URLFile_fd.WriteString(v + "\n")
 	}
-	for v, _ := range ips {
-		IPFile_fd.WriteString(v + "\n")
-	}
+
+	IPFile_fd.WriteString(utils.MakeCiscoACL(ips, Config.ACLName))
+
 	URLFile_fd.Flush()
 	IPFile_fd.Flush()
 	LOG.Println("Scan finished")
