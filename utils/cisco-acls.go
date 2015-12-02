@@ -3,7 +3,7 @@ package utils
 import (
 	"fmt"
 	"net"
-	//	"bufio"
+	"time"
 )
 
 func MakeCiscoACL(ips map[string]bool, aclname string) []string {
@@ -22,19 +22,33 @@ func UploadToCisco(ip string, listing []string) error {
 	// uploads listing to the cisco-like router/switch
 	// using telnet. returns true on success, otherwise false
 	fmt.Println("Reaching", ip)
-	conn, err := net.Dial("tcp4", "127.0.0.1:23")
+	conn, err := net.Dial("tcp4", ip+":23")
 	if err != nil {
 		return err
 	}
+	defer conn.Close()
+	conn.SetReadDeadline(time.Now().Add(5 * time.Second))
 	fmt.Println("Dialed. Reading...", ip)
-	strn := []byte{}
-	for {
-		count, err := conn.Read(strn)
-		if err != nil {
-			return err
-		}
-		fmt.Println(strn, count)
-	}
 
+	p := make([]byte, 32)
+	cnt, err := conn.Read(p)
+	if err != nil {
+		return err
+	}
+	fmt.Println(p, cnt)
+	_, err = conn.Write([]byte{'\xfd','\x18', '\xff', '\xfa', '\x18', '\x01', '\xfd', '\xf0'})
+	if err != nil {
+		return err
+	}
+	cnt, err = conn.Write([]byte("123123123123"))
+	if err != nil {
+		return err
+	}
+	fmt.Println(cnt)
+	cnt, err = conn.Read(p)
+	if err != nil {
+		return err
+	}
+	fmt.Println(p, cnt)
 	return nil
 }
