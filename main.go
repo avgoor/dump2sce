@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"runtime/pprof"
 )
 
 //parse an array of string and returns URL
@@ -22,7 +23,6 @@ func main() {
 var LOG = log.New(os.Stdout, "DUMPER:", log.Lshortfile|log.Ltime|log.Lmicroseconds|log.Ldate)
 
 func defCloser(x io.Closer) {
-	LOG.Println("About to close:", x)
 	x.Close()
 	return
 }
@@ -43,10 +43,11 @@ func RealMain() int {
 			LOG.Println("Cannot create ./profile_go!")
 			return 2
 		}
+
 		//		pprof.StartCPUProfile(fileprof)
 		defer defCloser(fileprof)
 		//		defer pprof.StopCPUProfile()
-		//defer pprof.WriteHeapProfile(fileprof)
+		defer pprof.WriteHeapProfile(fileprof)
 	}
 
 	URLFile, err := os.Create(Config.URLfile)
@@ -86,7 +87,9 @@ func RealMain() int {
 		URLFile_fd.WriteString(v + "\n")
 	}
 
-	IPFile_fd.WriteString(utils.MakeCiscoACL(ips, Config.ACLName))
+	for _, rule := range utils.MakeCiscoACL(ips, Config.ACLName) {
+		IPFile_fd.WriteString(rule)
+	}
 
 	URLFile_fd.Flush()
 	IPFile_fd.Flush()

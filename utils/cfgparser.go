@@ -16,6 +16,8 @@ type CFG struct {
 	URLfile       string
 	IPfile        string
 	ACLName       string
+	RouterIP	  string
+	SCEIP         string
 	FlavorID      int
 }
 
