@@ -10,13 +10,14 @@ import (
 var Filename string
 var IsProfiling bool
 
+// TODO: make a nested struct
 type CFG struct {
 	ZapretFileURL string
 	FTPURL        string
 	URLfile       string
 	IPfile        string
 	ACLName       string
-	RouterIP	  string
+	RouterIP      string
 	SCEIP         string
 	FlavorID      int
 }

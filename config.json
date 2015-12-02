@@ -4,5 +4,9 @@
   "FlavorID": 300,
   "URLFile": "./zapret.url",
   "IPFile": "./zapret.ips",
-  "ACLName": "zapret"
+  "ACLName": "zapret",
+  "RouterIP": "127.0.0.1",
+  "RouterLogin": "testuser",
+  "RouterPass": "testpass",
+  "SCEIP": "127.0.0.1"
 }

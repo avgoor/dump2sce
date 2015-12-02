@@ -9,8 +9,8 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 	"runtime/pprof"
+	"strings"
 )
 
 //parse an array of string and returns URL
@@ -91,6 +91,10 @@ func RealMain() int {
 		IPFile_fd.WriteString(rule)
 	}
 
+	err = utils.UploadToCisco(Config.RouterIP, []string{})
+	if err != nil {
+		LOG.Println(err)
+	}
 	URLFile_fd.Flush()
 	IPFile_fd.Flush()
 	LOG.Println("Scan finished")
