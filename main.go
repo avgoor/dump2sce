@@ -79,7 +79,6 @@ func RealMain() int {
 	IPFile_fd := bufio.NewWriter(IPFile)
 	LOG.Println("Starting scan")
 	for outs.Scan() {
-		// short strings contain no data, so omit them
 		val := strings.Split(outs.Text(), ";")
 		_ = utils.Url_parse(val, urls, ips)
 	}
