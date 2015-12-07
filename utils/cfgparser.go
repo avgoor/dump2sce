@@ -20,6 +20,7 @@ type CFG struct {
 	RouterIP      string
 	SCEIP         string
 	FlavorID      int
+	AdditionalSites []string
 }
 
 func init() {

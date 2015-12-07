@@ -82,6 +82,11 @@ func RealMain() int {
 		val := strings.Split(outs.Text(), ";")
 		_ = utils.Url_parse(val, urls, ips)
 	}
+	//add manually included urls to the main list
+	for _, u := range Config.AdditionalSites {
+		urls[u] = true
+	}
+
 	for v, _ := range urls {
 		URLFile_fd.WriteString(v + "\n")
 	}

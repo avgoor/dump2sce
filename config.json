@@ -8,5 +8,18 @@
   "RouterIP": "127.0.0.1",
   "RouterLogin": "testuser",
   "RouterPass": "testpass",
-  "SCEIP": "127.0.0.1"
+  "SCEIP": "127.0.0.1",
+  "AdditionalSites": [
+    "http://alcocopy.ru",
+    "http://alcobrand.com",
+    "http://Alcoretail.com",
+    "http://Ban-kok.ru",
+    "http://Barkrsk.ru",
+    "http://Alcohub.biz",
+    "http://Alkodostavka24.ru",
+    "http://24alk.ru",
+    "http://xn----7sbbbnb3aqdefc1bb7ck2t.xn--p1ai",
+    "http://xn--80aqahmnw.xn--b1ag9a.xn--p1ai",
+    "http://xn--80aiddscdzcw.xn--p1ai"
+  ]
 }
