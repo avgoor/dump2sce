@@ -36,7 +36,7 @@ func UploadToCisco(ip string, listing []string) error {
 		return err
 	}
 	fmt.Println(p, cnt)
-	_, err = conn.Write([]byte{'\xfd','\x18', '\xff', '\xfa', '\x18', '\x01', '\xfd', '\xf0'})
+	_, err = conn.Write([]byte{'\xfd', '\x18', '\xff', '\xfa', '\x18', '\x01', '\xfd', '\xf0'})
 	if err != nil {
 		return err
 	}
