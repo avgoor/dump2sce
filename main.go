@@ -95,7 +95,7 @@ func RealMain() int {
 		IPFile_fd.WriteString(rule)
 	}
 
-	err = utils.UploadToCisco(Config.RouterIP, []string{})
+	err = utils.UploadToCisco(Config.Router.IP, []string{})
 	if err != nil {
 		LOG.Println(err)
 	}

@@ -10,19 +10,24 @@ import (
 var Filename string
 var IsProfiling bool
 
-// TODO: make a nested struct
 type CFG struct {
 	ZapretFileURL   string
 	FTPURL          string
 	URLfile         string
 	IPfile          string
 	ACLName         string
-	RouterIP        string
-	SCEIP           string
 	FlavorID        int
 	AdditionalSites []string
+	SCE 		Remote
+	Router		Remote
 }
 
+type Remote struct {
+	IP		string
+	Login		string
+	Password	string
+	EnablePW	string
+}
 func init() {
 	flag.StringVar(&Filename, "file", "./config.json", "Filename and fullpath to the config file")
 	flag.BoolVar(&IsProfiling, "profile", false, "Turns on profiling")

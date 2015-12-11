@@ -5,10 +5,18 @@
   "URLFile": "./zapret.url",
   "IPFile": "./zapret.ips",
   "ACLName": "zapret",
-  "RouterIP": "127.0.0.1",
-  "RouterLogin": "testuser",
-  "RouterPass": "testpass",
-  "SCEIP": "127.0.0.1",
+  "SCE": {
+    "IP": "127.0.0.1",
+    "Login": "admin",
+    "Password": "admin",
+    "EnablePW": "admin"
+  },
+  "Router": {
+    "IP": "127.0.0.1",
+    "Login": "admin",
+    "Password": "admin",
+    "EnablePW": "admin"
+  },
   "AdditionalSites": [
     "alcocopy.ru",
     "alcobrand.com",

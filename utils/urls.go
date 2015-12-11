@@ -17,9 +17,9 @@ func Url_parse(raw []string, urls map[string]bool, ips map[string]bool) bool {
 		return false
 	}
 	/*
-	 * We assume here that after splitting the original string into a substrings,
-	 * we get an array of the substrings that explicitly has [0], [1] and [2]
-	 * substrings. The previous check exits from procedure otherwise we would get
+	 * We assume here that after splitting the original string into substrings,
+	 * we get an array of substrings that explicitly has [0], [1] and [2]
+	 * substrings. The previous check exits from the procedure otherwise we would get
 	 * here and catch a panic. Now we check if there is enough URL-substring length
 	 * to operate on.
 	 */
@@ -58,6 +58,6 @@ Have_non_http:
 }
 
 func normalize_url(src string) string {
-	//takes string and escapes ":" in it
+	//takes string, throws away http:// and escapes ":" in it
 	return strings.Replace(src[7:], ":", "\\:", -1)
 }
