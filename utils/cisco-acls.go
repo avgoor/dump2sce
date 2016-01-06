@@ -17,8 +17,7 @@ func MakeCiscoACL(ips map[string]bool, aclname string) []string {
 	for ip, _ := range ips {
 		all = append(all, fmt.Sprintf("deny ip %s any\n", ip))
 	}
-	all = append(all, "end\n")
-	all = append(all, "end\n")
+	all = append(all, "exit\n")
 	return all
 }
 
