@@ -1,11 +1,9 @@
 package main
 
-//sce-url-database import cleartext-file ftp://ftp:ftp@46.148.208.22/pub/zi.list flavor-id 300
 import (
 	"./utils"
 	"bufio"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -22,11 +20,6 @@ func main() {
 
 var LOG = log.New(os.Stdout, "DUMPER:", log.Lshortfile|log.Ltime|log.Lmicroseconds|log.Ldate)
 
-func defCloser(x io.Closer) {
-	x.Close()
-	return
-}
-
 func RealMain() int {
 	urls := make(map[string]bool, 15000)
 	ips := make(map[string]bool, 2000)
@@ -34,6 +27,7 @@ func RealMain() int {
 	Config, err := utils.GetCFG(filename)
 	if err != nil {
 		fmt.Println("Cannot read config from:", filename)
+		fmt.Println(err)
 		return 1
 	}
 	LOG.Print(Config)
@@ -45,32 +39,27 @@ func RealMain() int {
 		}
 
 		//		pprof.StartCPUProfile(fileprof)
-		defer defCloser(fileprof)
+		defer fileprof.Close()
 		//		defer pprof.StopCPUProfile()
 		defer pprof.WriteHeapProfile(fileprof)
 	}
-
 	URLFile, err := os.Create(Config.URLfile)
 	if err != nil {
 		LOG.Println("Cannot write to urls-file!")
 		return 8
 	}
-	defer defCloser(URLFile)
-
 	IPFile, err := os.Create(Config.IPfile)
 	if err != nil {
 		LOG.Println("Cannot write to ips-file!")
 		return 8
 	}
-	defer defCloser(IPFile)
-
 	LOG.Println("Downloading...")
 	x, err := http.Get(Config.ZapretFileURL)
 	if (err != nil) || (x.StatusCode != 200) {
 		LOG.Println("Cannot download file:", Config.ZapretFileURL)
 		return 5
 	} else {
-		defer defCloser(x.Body)
+		defer x.Body.Close()
 	}
 	LOG.Println("Got file")
 
@@ -86,21 +75,20 @@ func RealMain() int {
 	for _, u := range Config.AdditionalSites {
 		urls[u] = true
 	}
-
 	for v, _ := range urls {
 		URLFile_fd.WriteString(v + "\n")
 	}
-
 	for _, rule := range utils.MakeCiscoACL(ips, Config.ACLName) {
 		IPFile_fd.WriteString(rule)
 	}
-
-	err = utils.UploadToCisco(Config.Router.IP, []string{})
+	URLFile_fd.Flush()
+	IPFile_fd.Flush()
+	URLFile.Close()
+	IPFile.Close()
+	LOG.Println("Scan finished")
+	err = utils.UploadToCisco(Config.SCE, Config.SCE.OptionalCMDS)
 	if err != nil {
 		LOG.Println(err)
 	}
-	URLFile_fd.Flush()
-	IPFile_fd.Flush()
-	LOG.Println("Scan finished")
 	return 0
 }

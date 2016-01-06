@@ -1,19 +1,26 @@
 {
   "ZapretFileURL": "https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv",
-  "FTPURL": "ftp://ftp:ftp@127.0.0.1/pub/zi.list",
   "FlavorID": 300,
-  "URLFile": "./zapret.url",
+  "URLFile": "/var/ftp/pub/zapret.url",
   "IPFile": "./zapret.ips",
   "ACLName": "zapret",
   "SCE": {
     "IP": "127.0.0.1",
     "Login": "admin",
+    "Timeout": 300,
     "Password": "admin",
-    "EnablePW": "admin"
+    "EnablePW": "admin",
+    "OptionalCMDS":[
+      "conf t\n",
+      "interface LineCard 0\n",
+      "sce-url-database import cleartext-file ftp://ftp:ftp@127.0.0.1/pub/zapret.url flavor-id 300\n",
+      "exit\n"
+    ]
   },
   "Router": {
     "IP": "127.0.0.1",
     "Login": "admin",
+    "Timeout": 5,
     "Password": "admin",
     "EnablePW": "admin"
   },

@@ -18,16 +18,19 @@ type CFG struct {
 	ACLName         string
 	FlavorID        int
 	AdditionalSites []string
-	SCE 		Remote
-	Router		Remote
+	SCE             Remote
+	Router          Remote
 }
 
 type Remote struct {
-	IP		string
-	Login		string
-	Password	string
-	EnablePW	string
+	IP           string
+	Login        string
+	Password     string
+	EnablePW     string
+	Timeout      int
+	OptionalCMDS []string
 }
+
 func init() {
 	flag.StringVar(&Filename, "file", "./config.json", "Filename and fullpath to the config file")
 	flag.BoolVar(&IsProfiling, "profile", false, "Turns on profiling")
