@@ -38,19 +38,12 @@ func RealMain() int {
 			return 2
 		}
 
-		//		pprof.StartCPUProfile(fileprof)
 		defer fileprof.Close()
-		//		defer pprof.StopCPUProfile()
 		defer pprof.WriteHeapProfile(fileprof)
 	}
 	URLFile, err := os.Create(Config.URLfile)
 	if err != nil {
 		LOG.Println("Cannot write to urls-file!")
-		return 8
-	}
-	IPFile, err := os.Create(Config.IPfile)
-	if err != nil {
-		LOG.Println("Cannot write to ips-file!")
 		return 8
 	}
 	LOG.Println("Downloading...")
@@ -65,7 +58,6 @@ func RealMain() int {
 
 	outs := bufio.NewScanner(x.Body)       //scanner returns lines one by one
 	URLFile_fd := bufio.NewWriter(URLFile) //buffered output fast as hell
-	IPFile_fd := bufio.NewWriter(IPFile)
 	LOG.Println("Starting scan")
 	for outs.Scan() {
 		val := strings.Split(outs.Text(), ";")
@@ -78,16 +70,21 @@ func RealMain() int {
 	for v, _ := range urls {
 		URLFile_fd.WriteString(v + "\n")
 	}
-	for _, rule := range utils.MakeCiscoACL(ips, Config.ACLName) {
-		IPFile_fd.WriteString(rule)
-	}
+
 	URLFile_fd.Flush()
-	IPFile_fd.Flush()
 	URLFile.Close()
-	IPFile.Close()
 	LOG.Println("Scan finished")
+	LOG.Println("Uploading URLs to SCE")
 	err = utils.UploadToCisco(Config.SCE, Config.SCE.OptionalCMDS)
 	if err != nil {
+		LOG.Println("Updating SCE failed!")
+		LOG.Println(err)
+	}
+	LOG.Println("SCE update finished")
+	LOG.Println("Uploading IPs to Cisco Router")
+	err = utils.UploadToCisco(Config.Router, utils.MakeCiscoACL(ips, Config.ACLName))
+	if err != nil {
+		LOG.Println("Updating SCE failed!")
 		LOG.Println(err)
 	}
 	return 0

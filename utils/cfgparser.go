@@ -14,7 +14,6 @@ type CFG struct {
 	ZapretFileURL   string
 	FTPURL          string
 	URLfile         string
-	IPfile          string
 	ACLName         string
 	FlavorID        int
 	AdditionalSites []string

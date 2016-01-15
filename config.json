@@ -1,8 +1,7 @@
 {
   "ZapretFileURL": "https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv",
   "FlavorID": 300,
-  "URLFile": "/var/ftp/pub/zapret.url",
-  "IPFile": "./zapret.ips",
+  "URLFile": "./zapret.url",
   "ACLName": "zapret",
   "SCE": {
     "IP": "127.0.0.1",
