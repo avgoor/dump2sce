@@ -13,10 +13,16 @@ func MakeCiscoACL(ips map[string]bool, aclname string) []string {
 	// that denies all the IPs. returns slice of strings
 	all := make([]string, 0)
 	all = append(all, fmt.Sprintf("conf t\n"))
+	// at first delete this acl, as we don't want to keep old IPs there
+	// and don't want to make some change tracking algo, which can precisely
+	// remove or insert rule. (it's a way more complicated task)
+	all = append(all, fmt.Sprintf("no ip access-list extended %s\n", aclname))
 	all = append(all, fmt.Sprintf("ip access-list extended %s\n", aclname))
 	for ip, _ := range ips {
-		all = append(all, fmt.Sprintf("deny ip %s any\n", ip))
+		all = append(all, fmt.Sprintf("deny ip host %s any\n", ip))
 	}
+	// permit any other traffic, otherwise it will be a bad day for sysadmin
+	all = append(all, "permit ip any any\n")
 	all = append(all, "exit\n")
 	return all
 }

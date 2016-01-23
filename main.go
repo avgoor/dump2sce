@@ -84,7 +84,7 @@ func RealMain() int {
 	LOG.Println("Uploading IPs to Cisco Router")
 	err = utils.UploadToCisco(Config.Router, utils.MakeCiscoACL(ips, Config.ACLName))
 	if err != nil {
-		LOG.Println("Updating SCE failed!")
+		LOG.Println("Updating Router failed!")
 		LOG.Println(err)
 	}
 	return 0
