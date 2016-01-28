@@ -30,28 +30,28 @@ func TestConfigParser(t *testing.T) {
 }
 
 func Test_url_parsing_and_normalisation(t *testing.T) {
-	_original_http := []string{"127.0.0.1", "example.com", "http://example.com/?newsid=1:1"}
-	_expected_http := "example.com/?newsid=1\\:1"
-	_original_https := []string{"127.0.0.2", "example.org", "https://example.org/?newsid=1:1"}
-	_expected_https := "127.0.0.2"
-	_invalid_string := []string{"tooshort"}
+	_originalHTTP := []string{"127.0.0.1", "example.com", "http://example.com/?newsid=1:1"}
+	_expectedHTTP := "example.com/?newsid=1\\:1"
+	_originalHTTPS := []string{"127.0.0.2", "example.org", "https://example.org/?newsid=1:1"}
+	_expectedHTTPS := "127.0.0.2"
+	_invalidString := []string{"tooshort"}
 
 	urls := make(map[string]bool)
 	ips := make(map[string]bool)
 
-	if !utils.Url_parse(_original_http, urls, ips) {
-		t.Error("error parsing", _original_http)
+	if !utils.Url_parse(_originalHTTP, urls, ips) {
+		t.Error("error parsing", _originalHTTP)
 	}
-	if _url, ok := urls[_expected_http]; !ok {
-		t.Error("error parsing http, expected", _expected_http, "got", _url)
+	if _url, ok := urls[_expectedHTTP]; !ok {
+		t.Error("error parsing http, expected", _expectedHTTP, "got", _url)
 	}
-	if !utils.Url_parse(_original_https, urls, ips) {
-		t.Error("error parsing", _original_https)
+	if !utils.Url_parse(_originalHTTPS, urls, ips) {
+		t.Error("error parsing", _originalHTTPS)
 	}
-	if _ip, ok := ips[_expected_https]; !ok {
-		t.Error("error parsing https, expected", _expected_https, "got", _ip)
+	if _ip, ok := ips[_expectedHTTPS]; !ok {
+		t.Error("error parsing https, expected", _expectedHTTPS, "got", _ip)
 	}
-	if utils.Url_parse(_invalid_string, urls, ips) {
-		t.Error("Url_parse should fail on", _invalid_string, "but it succeed!")
+	if utils.Url_parse(_invalidString, urls, ips) {
+		t.Error("Url_parse should fail on", _invalidString, "but it succeed!")
 	}
 }

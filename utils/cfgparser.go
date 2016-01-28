@@ -7,21 +7,23 @@ import (
 	"strconv"
 )
 
+//Filename is exported
 var Filename string
+//IsProfiling is exported
 var IsProfiling bool
 
-type CFG struct {
+type config struct {
 	ZapretFileURL   string
 	FTPURL          string
 	URLfile         string
 	ACLName         string
 	FlavorID        int
 	AdditionalSites []string
-	SCE             Remote
-	Router          Remote
+	SCE             remote
+	Router          remote
 }
 
-type Remote struct {
+type remote struct {
 	IP           string
 	Login        string
 	Password     string
@@ -36,24 +38,23 @@ func init() {
 	flag.Parse()
 }
 
-//parses json-file referenced by path into CFG
-
-func GetCFG(path string) (CFG, error) {
+//GetCFG parses json-file referenced by path into CFG
+func GetCFG(path string) (config, error) {
 	cfgfile, err := os.Open(path)
 	if err != nil {
-		return CFG{}, err
+		return config{}, err
 	}
 	defer cfgfile.Close()
 	decoder := json.NewDecoder(cfgfile)
-	cfg := CFG{}
+	cfg := config{}
 	err = decoder.Decode(&cfg)
 	if err != nil {
-		return CFG{}, err
+		return config{}, err
 	}
 	return cfg, nil
 }
 
-func (c *CFG) String() string {
+func (c *config) String() string {
 	return "[URL: " + c.ZapretFileURL + " ; FTP: " +
 		c.FTPURL + " ; FlavorID: " + strconv.Itoa(c.FlavorID) + "]"
 }

@@ -4,7 +4,9 @@ import (
 	"strings"
 )
 
-func Url_parse(raw []string, urls map[string]bool, ips map[string]bool) bool {
+
+// URLParse is an exported function that fills urls/ips maps and return bool
+func URLParse(raw []string, urls map[string]bool, ips map[string]bool) bool {
 	/*
 	 * raw is an array of substrings from the original string that was
 	 * splitted by semicolons. The first one [0] is an array of IPs (one or more,
@@ -36,20 +38,20 @@ func Url_parse(raw []string, urls map[string]bool, ips map[string]bool) bool {
 	 * to the urls-list, otherwise we should avoid all the URLs in a string and go with IPs.
 	 */
 
-	urls_temp := strings.Split(raw[2], " | ")
+	urlsTemp := strings.Split(raw[2], " | ")
 
-	for _, _url := range urls_temp {
+	for _, _url := range urlsTemp {
 		if !strings.Contains(_url, "http://") {
-			goto Have_non_http
+			goto HaveNonHTTP
 		}
 	}
-	for _, _url := range urls_temp {
-		_url := normalize_url(_url)
+	for _, _url := range urlsTemp {
+		_url := normalizeURL(_url)
 		urls[_url] = true
 	}
 	return true
 
-Have_non_http:
+HaveNonHTTP:
 	// TODO: don't trust IPs from list, make internal resolving (awful)
 	/* We only get here if some of URLs in the array have non-http scheme */
 	for _, v := range strings.Split(raw[0], " | ") {
@@ -61,7 +63,7 @@ Have_non_http:
 	return false
 }
 
-func normalize_url(src string) string {
+func normalizeURL(src string) string {
 	//takes string, throws away http:// and escapes ":" in it
 	return strings.Replace(src[7:], ":", "\\:", -1)
 }
