@@ -29,7 +29,7 @@ func TestConfigParser(t *testing.T) {
 	}
 }
 
-func Test_url_parsing_and_normalisation(t *testing.T) {
+func Test_url_parsing_and_normalization(t *testing.T) {
 	_originalHTTP := []string{"127.0.0.1", "example.com", "http://example.com/?newsid=1:1"}
 	_expectedHTTP := "example.com/?newsid=1\\:1"
 	_originalHTTPS := []string{"127.0.0.2", "example.org", "https://example.org/?newsid=1:1"}
@@ -39,19 +39,19 @@ func Test_url_parsing_and_normalisation(t *testing.T) {
 	urls := make(map[string]bool)
 	ips := make(map[string]bool)
 
-	if !utils.Url_parse(_originalHTTP, urls, ips) {
+	if !utils.URLParse(_originalHTTP, urls, ips) {
 		t.Error("error parsing", _originalHTTP)
 	}
 	if _url, ok := urls[_expectedHTTP]; !ok {
 		t.Error("error parsing http, expected", _expectedHTTP, "got", _url)
 	}
-	if !utils.Url_parse(_originalHTTPS, urls, ips) {
+	if !utils.URLParse(_originalHTTPS, urls, ips) {
 		t.Error("error parsing", _originalHTTPS)
 	}
 	if _ip, ok := ips[_expectedHTTPS]; !ok {
 		t.Error("error parsing https, expected", _expectedHTTPS, "got", _ip)
 	}
-	if utils.Url_parse(_invalidString, urls, ips) {
-		t.Error("Url_parse should fail on", _invalidString, "but it succeed!")
+	if utils.URLParse(_invalidString, urls, ips) {
+		t.Error("URLParse should fail on", _invalidString, "but it succeed!")
 	}
 }
