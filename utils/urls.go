@@ -1,12 +1,18 @@
 package utils
 
 import (
+	"net"
+	"net/url"
 	"strings"
-)
 
+	"golang.org/x/net/idna"
+)
 
 // URLParse is an exported function that fills urls/ips maps and return bool
 func URLParse(raw []string, urls map[string]bool, ips map[string]bool) bool {
+
+	u_parsed := []*url.URL{}
+
 	/*
 	 * raw is an array of substrings from the original string that was
 	 * splitted by semicolons. The first one [0] is an array of IPs (one or more,
@@ -15,7 +21,7 @@ func URLParse(raw []string, urls map[string]bool, ips map[string]bool) bool {
 	 * one substring if it was unable to find a separator in the original
 	 * string. Therefore, we must firstly ensure that our array consists
 	 * from at least 3 elements.
-	 * [ip (| ip2 | ip3 -- optional)] [host] [url (| url2 | url3 optional)]
+	 * [date] [(urls)] [host(s)] [ip(s)]
 	 */
 	if len(raw) < 3 {
 		return false
@@ -27,34 +33,52 @@ func URLParse(raw []string, urls map[string]bool, ips map[string]bool) bool {
 	 * here and catch a panic. Now we check if there is enough a URL-substring length
 	 * to operate on, if not - just return raw[1] which is a domain name of the resource.
 	 */
-	if len(raw[2]) < 5 {
-		urls[raw[1]] = true
-		return true
+
+	if len(raw[1]) < 4 {
+		goto HaveNonHTTP
 	}
-	/*
-	 * As Cisco SCE is unable to block/redirect non-http requests (https, for example),
-	 * the only decision is to block non-http with ip rules. So here we are checking
-	 * whether the URLs substring contains valid plain-http URLs and then including them
-	 * to the urls-list, otherwise we should avoid all the URLs in a string and go with IPs.
-	 */
 
-	urlsTemp := strings.Split(raw[2], " | ")
+	for _, tmp := range strings.Split(raw[1], ",") {
+		_url, err := url.Parse(tmp)
+		if err != nil {
+			// as "" is a valid URL too (sic!)
+			// this code does nothing useful
+			return false //goto host check
+		}
+		u_parsed = append(u_parsed, _url)
+	}
 
-	for _, _url := range urlsTemp {
-		if !strings.Contains(_url, "http://") {
+	for _, _url := range u_parsed {
+		/* It is much better to treat a URL having "/" URI
+		   or too long URI as a domain-only, along with a pure non-http URL */
+		rq := _url.RequestURI()
+		not_ok := ((_url.Scheme != "http") || (rq == "/") || (len(rq) > 200))
+		not_ok = not_ok || (strings.ContainsAny(rq, ":*"))
+		//TODO: check if our URL is already in the non-http database
+		if not_ok {
 			goto HaveNonHTTP
 		}
 	}
-	for _, _url := range urlsTemp {
-		_url := normalizeURL(_url)
-		urls[_url] = true
+	/* If we get here this means all the checks above are ok */
+	for _, u := range u_parsed {
+		host, _, err := net.SplitHostPort(u.Host)
+		if err != nil {
+			host = u.Host
+		}
+		_t, _ := idna.ToASCII(host)
+		_t = strings.TrimSuffix(_t, ".")
+		_t = _t + u.RequestURI()
+		urls[_t] = true
 	}
+
 	return true
 
 HaveNonHTTP:
-	// TODO: don't trust IPs from list, make internal resolving (awful)
-	/* We only get here if some of URLs in the array have non-http scheme */
-	for _, v := range strings.Split(raw[0], " | ") {
+	/*
+	   We only get here if some of URLs in the array have non-http scheme.
+	   So the domain name should be used instead.
+	*/
+	for _, v := range strings.Split(raw[3], ",") {
 		ips[v] = true
 	}
 	return true

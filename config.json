@@ -1,5 +1,5 @@
 {
-  "ZapretFileURL": "https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv",
+  "ZapretFileURL": "https://api.antizapret.info/all.php",
   "FlavorID": 300,
   "URLFile": "./zapret.url",
   "ACLName": "zapret",
