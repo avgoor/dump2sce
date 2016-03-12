@@ -9,6 +9,7 @@ import (
 
 //Filename is exported
 var Filename string
+
 //IsProfiling is exported
 var IsProfiling bool
 
@@ -16,6 +17,8 @@ type config struct {
 	ZapretFileURL   string
 	FTPURL          string
 	URLfile         string
+	DomainsFile     string
+	RedirectIP	string
 	ACLName         string
 	FlavorID        int
 	AdditionalSites []string

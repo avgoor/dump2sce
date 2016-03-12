@@ -22,7 +22,7 @@ var logIt = log.New(os.Stdout, "DUMPER:", log.Lshortfile|log.Ltime|log.Lmicrosec
 
 func realMain() int {
 	urls := make(map[string]bool, 15000)
-	ips := make(map[string]bool, 2000)
+	domains := make(map[string]bool, 15000)
 	filename := utils.Filename
 	Config, err := utils.GetCFG(filename)
 	if err != nil {
@@ -46,6 +46,11 @@ func realMain() int {
 		logIt.Println("Cannot write to urls-file!")
 		return 8
 	}
+	DomainsFile, err := os.Create(Config.DomainsFile)
+	if err != nil {
+		logIt.Println("Cannot write to domains-file!")
+		return 8
+	}
 	logIt.Println("Downloading...")
 	x, err := http.Get(Config.ZapretFileURL)
 	if (err != nil) || (x.StatusCode != 200) {
@@ -55,12 +60,13 @@ func realMain() int {
 	defer x.Body.Close()
 	logIt.Println("Got file")
 
-	outs := bufio.NewScanner(x.Body)       //scanner returns lines one by one
+	outs := bufio.NewScanner(x.Body)      //scanner returns lines one by one
 	URLFilefd := bufio.NewWriter(URLFile) //buffered output fast as hell
+	DomainsFilefd := bufio.NewWriter(DomainsFile)
 	logIt.Println("Starting scan")
 	for outs.Scan() {
 		val := strings.Split(outs.Text(), ";")
-		_ = utils.URLParse(val, urls, ips)
+		_ = utils.URLParse(val, urls, domains)
 	}
 	//add manually included urls to the main list
 	for _, u := range Config.AdditionalSites {
@@ -69,9 +75,13 @@ func realMain() int {
 	for v := range urls {
 		URLFilefd.WriteString(v + "\n")
 	}
-
+	for _, v := range utils.MakeUnboundRules(domains, Config.RedirectIP) {
+		DomainsFilefd.WriteString(v)
+	}
 	URLFilefd.Flush()
+	DomainsFilefd.Flush()
 	URLFile.Close()
+	DomainsFile.Close()
 	logIt.Println("Scan finished")
 	logIt.Println("Uploading URLs to SCE")
 	err = utils.UploadToCisco(Config.SCE, Config.SCE.OptionalCMDS)
@@ -80,11 +90,13 @@ func realMain() int {
 		logIt.Println(err)
 	}
 	logIt.Println("SCE update finished")
+/*	//Turned off so far, as there is no need to make ACLs
 	logIt.Println("Uploading IPs to Cisco Router")
-	err = utils.UploadToCisco(Config.Router, utils.MakeCiscoACL(ips, Config.ACLName))
+	err = utils.UploadToCisco(Config.Router, utils.MakeCiscoACL(domains, Config.ACLName))
 	if err != nil {
 		logIt.Println("Updating Router failed!")
 		logIt.Println(err)
 	}
+*/
 	return 0
 }

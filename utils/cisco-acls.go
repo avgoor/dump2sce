@@ -7,6 +7,7 @@ import (
 	"net"
 	"time"
 )
+
 // MakeCiscoACL returns a slice of strings that contains
 // rules in cisco's format
 func MakeCiscoACL(ips map[string]bool, aclname string) []string {
@@ -43,6 +44,7 @@ func readUntil(r io.Reader, bu []byte) ([]byte, error) {
 		}
 	}
 }
+
 // UploadToCisco is a naive telnet implementation that logs into
 // a device, sends arbitrary commands (like acl) and logs out.
 func UploadToCisco(cfg remote, listing []string) error {

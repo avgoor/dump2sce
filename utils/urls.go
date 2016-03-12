@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"net"
 	"net/url"
 	"strings"
@@ -9,7 +10,7 @@ import (
 )
 
 // URLParse is an exported function that fills urls/ips maps and return bool
-func URLParse(raw []string, urls map[string]bool, ips map[string]bool) bool {
+func URLParse(raw []string, urls map[string]bool, domains map[string]bool) bool {
 
 	u_parsed := []*url.URL{}
 
@@ -49,25 +50,41 @@ func URLParse(raw []string, urls map[string]bool, ips map[string]bool) bool {
 	}
 
 	for _, _url := range u_parsed {
-		/* It is much better to treat a URL having "/" URI
-		   or too long URI as a domain-only, along with a pure non-http URL */
+		/*
+		   It is much better to treat a URL having "/" URI
+		   or too long URI as a domain-only, along with a pure non-http URL
+		   and URI containing symbols like ':' and '*', which are the special
+		   ones in SCE.
+		*/
 		rq := _url.RequestURI()
-		not_ok := ((_url.Scheme != "http") || (rq == "/") || (len(rq) > 200))
+		not_ok := ((_url.Scheme != "http") || (rq == "/"))
 		not_ok = not_ok || (strings.ContainsAny(rq, ":*"))
-		//TODO: check if our URL is already in the non-http database
+		//TODO: check if our URL's host is already in the non-http database
 		if not_ok {
 			goto HaveNonHTTP
 		}
 	}
 	/* If we get here this means all the checks above are ok */
 	for _, u := range u_parsed {
+		// some hosts contain port in url, this is not good
 		host, _, err := net.SplitHostPort(u.Host)
 		if err != nil {
 			host = u.Host
 		}
+		// some guys in EIAS think that it is totally ok
+		// to include utf-8 host names in the list without
+		// encoding them according to the RULES
 		_t, _ := idna.ToASCII(host)
+		// those guys are also ok with the domain names
+		// ending with a dot
 		_t = strings.TrimSuffix(_t, ".")
-		_t = _t + u.RequestURI()
+		_p := u.EscapedPath()
+		// && (_p[len(_p)-1] == '/')
+		if (len(u.RawQuery) == 0) {
+			_t = _t + _p + "*"
+		} else {
+			_t = _t + u.RequestURI()
+		}
 		urls[_t] = true
 	}
 
@@ -78,8 +95,14 @@ HaveNonHTTP:
 	   We only get here if some of URLs in the array have non-http scheme.
 	   So the domain name should be used instead.
 	*/
-	for _, v := range strings.Split(raw[3], ",") {
-		ips[v] = true
+	for _, v := range strings.Split(raw[2], ",") {
+		if len(v) < 1 {
+			fmt.Println("no domain for", raw)
+			continue
+		}
+		_t, _ := idna.ToASCII(v)
+		_t = strings.TrimSuffix(_t, ".")
+		domains[_t] = true
 	}
 	return true
 
