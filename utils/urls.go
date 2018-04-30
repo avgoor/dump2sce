@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"net"
 	"net/url"
 	"strings"
@@ -80,7 +79,7 @@ func URLParse(raw []string, urls map[string]bool, domains map[string]bool) bool 
 		_t = strings.TrimSuffix(_t, ".")
 		_p := u.EscapedPath()
 		// && (_p[len(_p)-1] == '/')
-		if (len(u.RawQuery) == 0) {
+		if len(u.RawQuery) == 0 {
 			_t = _t + _p + "*"
 		} else {
 			_t = _t + u.RequestURI()
@@ -97,7 +96,7 @@ HaveNonHTTP:
 	*/
 	for _, v := range strings.Split(raw[2], ",") {
 		if len(v) < 1 {
-			fmt.Println("no domain for", raw)
+			//fmt.Println("no domain for", raw)
 			continue
 		}
 		_t, _ := idna.ToASCII(v)
@@ -105,9 +104,6 @@ HaveNonHTTP:
 		domains[_t] = true
 	}
 	return true
-
-	/*Never get here*/
-	return false
 }
 
 func normalizeURL(src string) string {

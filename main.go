@@ -1,14 +1,16 @@
 package main
 
 import (
-	"./utils"
 	"bufio"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"runtime/pprof"
 	"strings"
+
+	"./utils"
 )
 
 //parse an array of string and returns URL
@@ -60,12 +62,17 @@ func realMain() int {
 	defer x.Body.Close()
 	logIt.Println("Got file")
 
-	outs := bufio.NewScanner(x.Body)      //scanner returns lines one by one
+	bodyReader := bufio.NewReaderSize(x.Body, 1024*1024)
 	URLFilefd := bufio.NewWriter(URLFile) //buffered output fast as hell
 	DomainsFilefd := bufio.NewWriter(DomainsFile)
-	logIt.Println("Starting scan")
-	for outs.Scan() {
-		val := strings.Split(outs.Text(), ";")
+	logIt.Println("Fetching contents")
+
+	data, err := ioutil.ReadAll(bodyReader)
+	strng := strings.Split(string(data), "\n")
+
+	logIt.Println("Start parsing")
+	for _, x := range strng {
+		val := strings.Split(x, ";")
 		_ = utils.URLParse(val, urls, domains)
 	}
 	//add manually included urls to the main list
@@ -90,13 +97,13 @@ func realMain() int {
 		logIt.Println(err)
 	}
 	logIt.Println("SCE update finished")
-/*	//Turned off so far, as there is no need to make ACLs
-	logIt.Println("Uploading IPs to Cisco Router")
-	err = utils.UploadToCisco(Config.Router, utils.MakeCiscoACL(domains, Config.ACLName))
-	if err != nil {
-		logIt.Println("Updating Router failed!")
-		logIt.Println(err)
-	}
-*/
+	/*	//Turned off so far, as there is no need to make ACLs
+		logIt.Println("Uploading IPs to Cisco Router")
+		err = utils.UploadToCisco(Config.Router, utils.MakeCiscoACL(domains, Config.ACLName))
+		if err != nil {
+			logIt.Println("Updating Router failed!")
+			logIt.Println(err)
+		}
+	*/
 	return 0
 }
